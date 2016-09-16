@@ -6,6 +6,7 @@ import routes from './modules/routes';
 
 
 render(
+   
     <Router
         routes={routes}
         history={browserHistory}/>,

@@ -9,6 +9,12 @@ Both production and develpment builds serve client and server code.
 
 ###Notes
 Change the production environment using:
- SET "NODE_ENV=production"
- or
- SET "NODE_ENV=dev""# React-Universal-App-Template" 
+    SET "NODE_ENV=production"
+    or
+    SET "NODE_ENV=dev"
+
+Debug express server using:
+    set DEBUG=express:*
+
+Development server runs on port 8080
+Production server runs on port 8081

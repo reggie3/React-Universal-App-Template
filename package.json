@@ -7,6 +7,7 @@
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:dev": "webpack-dev-server --inline --content-base public/ --history-api-fallback",
     "start:prod": "npm run build && node server.bundle.js",
+    "debug":"npm run build && node-debug server.bundle.js",
     "build:client": "webpack",
     "build:server": "webpack --config webpack.server.config.js",
     "build": "npm run build:client && npm run build:server"
@@ -14,9 +15,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fs": "0.0.1-security",
+    "lodash": "^4.15.0",
+    "morgan": "^1.7.0",
+    "npm-watch": "^0.1.6",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
-    "react-router": "^2.0.0"
+    "react-router": "^2.0.0",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.5.1",

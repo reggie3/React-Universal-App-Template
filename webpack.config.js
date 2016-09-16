@@ -1,6 +1,7 @@
 var webpack = require('webpack')
 
 module.exports = {
+  devtool: 'inline-source-map',
   entry: './index.js',
 
   // add this handful of plugins that optimize the build

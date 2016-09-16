@@ -64,6 +64,8 @@
 	var express = __webpack_require__(11);
 	var path = __webpack_require__(12);
 	var compression = __webpack_require__(13);
+	var fs = __webpack_require__(14);
+	var morgan = __webpack_require__(15);
 
 	/** 
 	 * these imports are required for server side rendering
@@ -81,32 +83,65 @@
 	var app = express();
 	app.use(compression());
 
+	var logfile = fs.createWriteStream('./logfile.log', { flags: 'a' });
+	app.use(morgan('combined', { stream: logfile }));
+
+	var enableLogging = true;
+
 	// this tells express to use the public directory
 	app.use(express.static(path.join(__dirname, 'public')));
 
 	// the line below will serve files from root including stuff like package.json
 	// app.use(express.static(__dirname));
 
-	// send all requests to index.html so browserHistory works
-
+	/**
+	 * app.get: respond to get requests
+	 * 
+	 */
 	app.get('*', function (req, res) {
-	  // match the routes to the url
+	  //logToFile("hello");
+	  console.log("request: " + JSON.stringify(req));
+	  console.log("response: " + JSON.stringify(res));
 	  (0, _reactRouter.match)({ routes: _routes2.default, location: req.url }, function (err, redirect, props) {
-	    // `RouterContext` is the what `Router` renders. `Router` keeps these
-	    // `props` in its state as it listens to `browserHistory`. But on the
-	    // server our app is stateless, so we need to use `match` to
-	    // get these props before rendering.
-	    var appHtml = (0, _server.renderToString)(_react2.default.createElement(_reactRouter.RouterContext, props));
-
-	    // dump the HTML into a template, lots of ways to do this, but none are
-	    // really influenced by React Router, so we're just using a little
-	    // function, `renderPage`
-	    res.send(renderPage(appHtml));
+	    // in here we can make some decisions all at once
+	    if (err) {
+	      // there was an error somewhere during route matching
+	      res.status(500).send(err.message);
+	    } else if (redirect) {
+	      // we haven't talked about `onEnter` hooks on routes, but before a
+	      // route is entered, it can redirect. Here we handle on the server.
+	      res.redirect(redirect.pathname + redirect.search);
+	    } else if (props) {
+	      // if we got props then we matched a route and can render
+	      var appHtml = (0, _server.renderToString)(_react2.default.createElement(_reactRouter.RouterContext, props));
+	      res.send(renderPage(appHtml));
+	    } else {
+	      // no errors, no redirect, we just didn't match anything
+	      res.status(404).send('Not Found');
+	    }
 	  });
 	});
 
+	var router = express.Router();
+	router.get('/api', function (req, res) {
+	  res.json({ message: 'hooray! welcome to our api!' });
+	});
+	// REGISTER OUR ROUTES -------------------------------
+	// all of our routes will be prefixed with /api
+	app.use('/api', router);
+
+	/**
+	 * renderPage: render the webpage the server will serve
+	 * @param {string} appHtml The string rendered from the react component
+	 */
 	function renderPage(appHtml) {
-	  return '\n    <!doctype html public="storage">\n    <html>\n    <meta charset=utf-8/>\n    <title>My First React Router App</title>\n    <link rel=stylesheet href=/index.css>\n    <div id=app>' + appHtml + '</div>\n    <script src="/bundle.js"></script>\n   ';
+	  return '\n    <!doctype html public="storage">\n    <html>\n    <meta charset=utf-8/>\n    <title>Universal React App Template</title>\n    <link rel=stylesheet href=/index.css>\n    <h1>hello</h1>\n    <div id=app>' + appHtml + '</div>\n    <script src="/bundle.js"></script>\n   ';
+	}
+
+	function logToFile(string) {
+	  if (enableLogging) {
+	    fs.createReadStream(logfile).pipe(string);
+	  }
 	}
 
 	var PORT = process.env.PORT || 8081;
@@ -478,6 +513,18 @@
 /***/ function(module, exports) {
 
 	module.exports = require("compression");
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	module.exports = require("fs");
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = require("morgan");
 
 /***/ }
 /******/ ]);
