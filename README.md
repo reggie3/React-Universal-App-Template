@@ -1,7 +1,7 @@
 #React universal app template
 
 ### Based on github repo here: 
-[https://github.com/reactjs/react-router-tutorial/tree/master/lessons/01-setting-up]
+https://github.com/reactjs/react-router-tutorial/tree/master/lessons/01-setting-up
 
 
 Includes webpack dev server for development builds and express server for production.
